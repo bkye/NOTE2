@@ -1,7 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
-/*
-** Copyright 2011, The Android Open Source Project
+/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
+** Not a Contribution.
+**
+** Copyright 2009, The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -18,8 +20,8 @@
 -->
 
 <!-- These resources are around just to allow their values to be customized
-     for different hardware and product builds. -->
-<resources>
+     for different hardware and product builds.  Do not translate. -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- List of regexpressions describing the interface (if any) that represent tetherable
          Wifi interfaces.  If the device doesn't want to support tethering over Wifi this
          should be empty.  An example would be "softap.*" -->
@@ -37,11 +39,14 @@
     <!-- Boolean indicating whether the wifi chipset has dual frequency band support -->
     <bool translatable="false" name="config_wifi_dual_band_support">true</bool>
 
-    <!-- Boolean indicating whether the wifi chipset has background scan support -->
+    <!-- Boolean indicating whether the wifi chipset supports background scanning mechanism.
+         This mechanism allows the host to remain in suspend state and the dongle to actively
+         scan and wake the host when a configured SSID is detected by the dongle. This chipset
+         capability can provide power savings when wifi needs to be always kept on. -->
     <bool translatable="false" name="config_wifi_background_scan_support">true</bool>
 
-    <!-- Flag indicating whether we should enable the automatic brightness in Settings.
-         config_hardware_automatic_brightness_available is not set, so we will use software implementation -->
+    <!-- Flag indicating whether the we should enable the automatic brightness in Settings.
+         Software implementation will be used if config_hardware_auto_brightness_available is not set -->
     <bool name="config_automatic_brightness_available">true</bool>
 
     <!-- If this is true, the screen will come on when you unplug usb/power/whatever. -->
@@ -53,85 +58,76 @@
          in to AC and 2 to stay on when plugged in to USB.  (So 3 for both.) -->
     <integer name="config_deskDockKeepsScreenOn">0</integer>
 
-    <!-- Device supports LED flashlight
-    <bool name="config_enableTorch">true</bool> -->
-
     <!-- Array of light sensor LUX values to define our levels for auto backlight brightness support.
-        The N entries of this array define N + 1 zones as follows:
+         The N entries of this array define N + 1 control points as follows:
+         (1-based arrays)
 
-        Zone 0: 0 <= LUX < array[0]
-        Zone 1: array[0] <= LUX < array[1]
-        ...
-        Zone N: array[N - 1] <= LUX < array[N]
-        Zone N + 1: array[N] <= LUX < infinity
+         Point 1:            (0, value[1]):             lux <= 0
+         Point 2:     (level[1], value[2]):  0        < lux <= level[1]
+         Point 3:     (level[2], value[3]):  level[2] < lux <= level[3]
+         ...
+         Point N+1: (level[N], value[N+1]):  level[N] < lux
 
-        Must be overridden in platform specific overlays
-    -->
+         The control points must be strictly increasing.  Each control point
+         corresponds to an entry in the brightness backlight values arrays.
+         For example, if LUX == level[1] (first element of the levels array)
+         then the brightness will be determined by value[2] (second element
+         of the brightness values array).
+
+         Spline interpolation is used to determine the auto-brightness
+         backlight values for LUX levels between these control points.
+
+         Must be overridden in platform specific overlays -->
     <integer-array name="config_autoBrightnessLevels">
-        <item>6</item>
-        <item>10</item>
-        <item>15</item>
-        <item>20</item>
-        <item>40</item>
-        <item>60</item>
-        <item>80</item>
-        <item>100</item>
-        <item>120</item>
-        <item>240</item>
-        <item>480</item>
-        <item>960</item>
-        <item>1920</item>
-        <item>2880</item>
-        <item>3840</item>
-        <item>7680</item>
-        <item>15360</item>
-        <item>30720</item>
-        <item>61440</item>
-        <item>121200</item>
+        <item>64</item>
+        <item>128</item>
+        <item>192</item>
+        <item>256</item>
+        <item>384</item>
+        <item>512</item>
+        <item>768</item>
+        <item>1024</item>
+        <item>1536</item>
+        <item>2048</item>
+        <item>3072</item>
+        <item>4096</item>
+        <item>6144</item>
+        <item>8192</item>
+        <item>12288</item>
+        <item>16384</item>
     </integer-array>
 
     <!-- Array of output values for LCD backlight corresponding to the LUX values
-        in the config_autoBrightnessLevels array. This array should have size one greater
-        than the size of the config_autoBrightnessLevels array.
-    -->
+         in the config_autoBrightnessLevels array.  This array should have size one greater
+         than the size of the config_autoBrightnessLevels array.
+         The brightness values must be between 0 and 255 and be non-decreasing.
+         This must be overridden in platform specific overlays -->
     <integer-array name="config_autoBrightnessLcdBacklightValues">
-        <item>40</item>
-        <item>50</item>
+        <item>20</item>
+        <item>30</item>
+        <item>45</item>
         <item>60</item>
-        <item>70</item>
-        <item>80</item>
+        <item>75</item>
         <item>90</item>
-        <item>100</item>
-        <item>110</item>
+        <item>105</item>
         <item>120</item>
-        <item>130</item>
-        <item>140</item>
+        <item>135</item>
         <item>150</item>
-        <item>160</item>
-        <item>170</item>
-        <item>185</item>
-        <item>200</item>
-        <item>215</item>
+        <item>165</item>
+        <item>180</item>
+        <item>195</item>
+        <item>210</item>
         <item>225</item>
-        <item>235</item>
-        <item>245</item>
+        <item>240</item>
         <item>255</item>
     </integer-array>
 
     <!-- Array of output values for button backlight corresponding to the LUX values
-        in the config_autoBrightnessLevels array. This array should have size one greater
-        than the size of the config_autoBrightnessLevels array.
-    -->
+         in the config_autoBrightnessLevels array.  This array should have size one greater
+         than the size of the config_autoBrightnessLevels array.
+         The brightness values must be between 0 and 255 and be non-decreasing.
+         This must be overridden in platform specific overlays -->
     <integer-array name="config_autoBrightnessButtonBacklightValues">
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
         <item>0</item>
         <item>0</item>
         <item>0</item>
@@ -147,20 +143,11 @@
     </integer-array>
 
     <!-- Array of output values for keyboard backlight corresponding to the LUX values
-        in the config_autoBrightnessLevels array. This array should have size one greater
-        than the size of the config_autoBrightnessLevels array.
-        i9300 has no keyboard so all values are zero.
-    -->
+         in the config_autoBrightnessLevels array.  This array should have size one greater
+         than the size of the config_autoBrightnessLevels array.
+         The brightness values must be between 0 and 255 and be non-decreasing.
+         This must be overridden in platform specific overlays -->
     <integer-array name="config_autoBrightnessKeyboardBacklightValues">
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
-        <item>0</item>
         <item>0</item>
         <item>0</item>
         <item>0</item>
@@ -175,19 +162,8 @@
         <item>0</item>
     </integer-array>
 
-    <!-- Defines the system property to set for performance profile xe: sys.cpu.modes. Leave it
-         blank if the device do not support performance profiles -->
-    <string name="config_perf_profile_prop" translatable="false">sys.perf.profile</string>
-
-    <!-- When config_perf_profile_prop is defined, this value MUST be the index of
-         one of the listes values in frameworks/base/core/res/res/values/cm_arrays.xml
-         for "perf_profile_values" array. Leave it blank if the device do not support
-         performance profiles  -->
-    <string name="config_perf_profile_default_entry" translatable="false">2</string>
-
-    <!-- Maximum number of supported users -->
-    <integer name="config_multiuserMaximumUsers">4</integer>
-
+    <!--  Maximum number of supported users -->
+    <integer name="config_multiuserMaximumUsers">2</integer>
     <!-- Whether UI for multi user should be shown -->
     <bool name="config_enableMultiUserUI">true</bool>
 
@@ -204,4 +180,14 @@
          * The device must be provisioned with HDCP keys (for protected content).
     -->
     <bool name="config_enableWifiDisplay">true</bool>
+
+    <!-- Defines the system property to set for performance profile xe: sys.cpu.modes. Leave it
+         blank if the device do not support performance profiles -->
+    <string name="config_perf_profile_prop" translatable="false">sys.perf.profile</string>
+
+    <!-- When config_perf_profile_prop is defined, this value MUST be the index of
+         one of the listes values in frameworks/base/core/res/res/values/cm_arrays.xml
+         for "perf_profile_values" array. Leave it blank if the device do not support
+         performance profiles  -->
+    <string name="config_perf_profile_default_entry" translatable="false">2</string>
 </resources>
